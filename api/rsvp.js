@@ -6,6 +6,7 @@ import path from 'node:path';
 // (rsvps.txt). On Vercel that file lives in Vercel Blob. On your own computer (no Blob
 // credentials) it is a plain rsvps.txt in the project folder.
 const USE_BLOB = !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+const ON_VERCEL = !!process.env.VERCEL;
 const LOCAL_FILE = path.join(process.cwd(), 'rsvps.txt');
 
 const FILE = 'rsvps.txt';          // the single text file (one JSON reply per line)
@@ -28,8 +29,14 @@ const parse = text => text.split('\n').filter(Boolean).map(l => { try { return J
 const serialize = rows => rows.map(r => JSON.stringify(r)).join('\n') + (rows.length ? '\n' : '');
 const clean = (v, max) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 
+// On Vercel the disk is read-only, so without a connected Blob store nothing can be saved.
+// Fail loudly (and clearly in the logs) instead of trying to write a local file.
+const needBlob = () => { if (!USE_BLOB && ON_VERCEL) throw Object.assign(new Error('Vercel Blob is not connected to this project (no BLOB_READ_WRITE_TOKEN).'), { code: 'NO_STORAGE' }); };
+const failBody = (e, msg) => ({ error: msg, code: e && e.code === 'NO_STORAGE' ? 'NO_STORAGE' : 'SAVE_FAILED', detail: String((e && e.message) || e).slice(0, 240) });
+
 // ---- the text file ----
 async function read() {
+  needBlob();
   if (!USE_BLOB) return { rows: fs.existsSync(LOCAL_FILE) ? parse(fs.readFileSync(LOCAL_FILE, 'utf8')) : [], etag: null };
   const { get } = await import('@vercel/blob');
   const r = await get(FILE, { access: 'private', useCache: false });
@@ -39,6 +46,7 @@ async function read() {
 }
 // Read, change, write back. If two people save at the same moment, the second retries.
 async function update(change) {
+  needBlob();
   if (!USE_BLOB) { // local file: no awaits between read and write, so it can't interleave
     const { rows } = await read();
     const { rows: next, out } = change(rows);
@@ -67,14 +75,14 @@ export async function GET(req) {
   const me = ownerId && sha(ownerId);
   let rows;
   try { ({ rows } = await read()); }
-  catch (e) { console.error('rsvp: read failed', e); return json({ error: 'Could not load your reply.' }, 500); }
+  catch (e) { console.error('rsvp: read failed', e); return json(failBody(e, 'Could not load your reply.'), 500); }
   const newest = [...rows].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   return json({ mine: me ? newest.filter(r => r.owner === me).map(({ owner, ...r }) => r) : [] });
 }
 
 export async function POST(req) {
   let b; try { b = await req.json(); } catch { return json({ error: 'Bad request.' }, 400); }
-  if (b.website) return json({ error: 'Could not send. Please try again.' }, 400);   // honeypot: only bots fill this
+  if (b.website) return json({ error: 'Could not send. Please try again.', code: 'HONEYPOT' }, 400);   // honeypot: only bots fill this
   if (typeof b.attending !== 'boolean') return json({ error: 'Please choose Attending or Not Attending.' }, 400);
   const name = clean(b.name, MAX_NAME);
   if (!name) return json({ error: 'Please enter your name.' }, 400);
@@ -97,7 +105,7 @@ export async function POST(req) {
       if (rows.filter(r => r.owner === owner).length >= MAX_PER_BROWSER) return { rows, out: 'limit' };
       return { rows: [...rows, reply], out: 'ok' };
     });
-  } catch (e) { console.error('rsvp: save failed', e); return json({ error: 'Could not send. Please try again.' }, 500); }
+  } catch (e) { console.error('rsvp: save failed', e); return json(failBody(e, 'Sorry, your reply could not be saved right now. Please try again in a little while.'), 500); }
   if (out === 'full') return json({ error: 'We have reached the most replies this page can hold. Please message us directly. Thank you!' }, 429);
   if (out === 'limit') return json({ error: "This browser has already sent the most replies it can. Thank you!" }, 429);
   const { owner: _o, ...safe } = reply;

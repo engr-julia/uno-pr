@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as prayers from './api/prayers.js';
 import * as rsvp from './api/rsvp.js';
+import * as status from './api/status.js';
 
 const PORT = process.env.PORT || 3000;
 const types = {
@@ -14,7 +15,7 @@ const types = {
   '.woff2': 'font/woff2',
 };
 const PUBLIC = path.resolve('public');
-const apis = { '/api/prayers': prayers, '/api/rsvp': rsvp };
+const apis = { '/api/prayers': prayers, '/api/rsvp': rsvp, '/api/status': status };
 
 http.createServer(async (rq, rs) => {
   const url = new URL(rq.url, 'http://localhost');

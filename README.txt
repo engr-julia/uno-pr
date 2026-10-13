@@ -15,6 +15,7 @@ FOLDER
                              (Cut from the PDF's clipart sheets and upscaled 4x; originals would be sharper still.)
   api/prayers.js           backend for the Prayer Registry (list, post, delete)
   api/rsvp.js              backend for the RSVP page (post, and read back your own reply)
+  api/status.js            open /api/status to check that saving works
   local.js                 run on your computer
   package.json             needs @vercel/blob
 
@@ -46,6 +47,12 @@ RSVP EMAIL NOTIFICATIONS (Web3Forms)
   because Web3Forms' free plan does not allow server-side sends. If the email fails, the RSVP is still saved in
   rsvps.txt, and guests are never shown an error for it. rsvps.txt stays your source of truth.
   Optional hardening: in the Web3Forms dashboard turn on domain restriction (paid plan) once your site is live.
+
+IF POSTING OR RSVP SAYS "COULD NOT POST / COULD NOT SEND"
+  Open  https://YOUR-SITE.vercel.app/api/status  (locally: http://localhost:3000/api/status). It says whether saving works and why not.
+  Most common cause: the Blob store is missing, was created PUBLIC, or was never connected to the project.
+  Fix: Vercel dashboard > Storage > Create > Blob > access PRIVATE > Connect to the project > Redeploy.
+  (Creating the store AFTER a deploy needs a redeploy, or the token is not seen.) /api/status also shows the exact error.
 
 PRAYER REGISTRY RULES
   - All prayers live in ONE text file (prayers.txt), one note per line.

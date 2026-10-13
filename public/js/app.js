@@ -13,7 +13,7 @@
     // Email notification for every RSVP (Web3Forms, free). Get your key at https://web3forms.com
     // (type engr.julia.rt@gmail.com, the key arrives by email) and paste it below.
     // Leave it empty and the RSVPs are still saved to rsvps.txt, just without the email.
-    web3formsKey: 'bf6fa12f-88a0-401f-8dd3-6bd8858b478a',
+    web3formsKey: '',
     pollMs: 20000,                             // how often the registry refreshes while open
   };
 
@@ -223,7 +223,7 @@
           }),
         });
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.error || 'Could not post. Please try again.');
+        if (!r.ok) { console.error('Save failed:', r.status, data.code, data.detail); throw new Error(data.error || 'Could not post. Please try again.'); }
         form.reset(); $('#name').disabled = false; $('#count').textContent = '0 / 600';
         closeDialog(); await load(); toast('Your prayer was posted. Thank you!');
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
@@ -348,7 +348,7 @@
           }),
         });
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.error || 'Could not send. Please try again.');
+        if (!r.ok) { console.error('Save failed:', r.status, data.code, data.detail); throw new Error(data.error || 'Could not send. Please try again.'); }
         emailReply({ name, attending, guests: Number($('#rsvp-guests').value), message: $('#rsvp-msg').value.trim() });
         form.reset(); $('#rsvp-count').textContent = '0 / 300';
         closeDialog(); await load();
