@@ -37,6 +37,12 @@ PRAYER REGISTRY RULES
     (tap twice to delete). The file stores only a hash of the cookie.
   - Limits (top of api/prayers.js): 10 prayers per browser, 500 in total, 600 characters each.
   - A hidden honeypot field blocks simple bots. To remove a guest's note yourself, edit prayers.txt in the Blob store.
+PRAYER REGISTRY RULES
+  - All prayers live in ONE text file (prayers.txt), one note per line.
+  - Each browser gets a random cookie; only that browser sees the trash icon on its own notes
+    (tap twice to delete). The file stores only a hash of the cookie.
+  - Limits (top of api/prayers.js): 10 prayers per browser, 500 in total, 600 characters each.
+  - A hidden honeypot field blocks simple bots. To remove a guest's note yourself, edit prayers.txt in the Blob store.
   - Clearing cookies / switching browser means a person can no longer delete their old notes.
 
 RSVP RULES
