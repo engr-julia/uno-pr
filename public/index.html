@@ -2,176 +2,164 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prayer Registry for Uno</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You're Invited — Uno's Dedication Ceremony</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f0f9ff">
+<meta name="description" content="You are cordially invited to the dedication ceremony of Uno Levine C. Chavez — Saturday, November 7, 5 PM, Quezon City.">
+<meta property="og:title" content="You're Invited — Uno's Dedication Ceremony">
+<meta property="og:description" content="Join us as we present our little one to the Lord. Saturday, November 7, 5 PM.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%B8%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Yellowtail&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --navy: #1f3a5f;
-  --gingham: #a9bddd;
-  --cream: #fbf8f1;
-  --sand: #f1e4cc;
-  --sky: #dce9f6;
-  --periwinkle: #dfe3f4;
-  --script: "Yellowtail", "Brush Script MT", cursive;
-  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
-}
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
-body { background: var(--cream); color: var(--navy); font-family: var(--serif); overflow: hidden; }
-
-/* The page fills the whole window. Inside a 16:9 iframe that is exactly 16:9.
-   All sizes use --u, which scales with the window and never lets content outgrow its height. */
-.root { position: fixed; inset: 0; container-type: size; }
-.stage {
-  --u: max(min(1cqw, 1cqh * 1.7778), 5.2px);
-  --g: calc(3.2 * var(--u));
-  width: 100%; height: 100%; position: relative; overflow: hidden;
-  background:
-    repeating-linear-gradient(0deg, rgba(169,189,221,.6) 0 calc(var(--g)/2), transparent calc(var(--g)/2) var(--g)),
-    repeating-linear-gradient(90deg, rgba(169,189,221,.6) 0 calc(var(--g)/2), transparent calc(var(--g)/2) var(--g)),
-    var(--cream);
-}
-.paper {
-  position: absolute; inset: calc(2.4 * var(--u)); border-radius: calc(.6 * var(--u));
-  background:
-    radial-gradient(ellipse at 20% 15%, #f4ecdc 0, transparent 45%),
-    radial-gradient(ellipse at 85% 80%, #f1e7d3 0, transparent 40%),
-    var(--cream);
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 0 0 calc(.15 * var(--u)) rgba(31,58,95,.08);
-}
-
-/* Artwork from the invitation (transparent cut-outs) */
-.art { position: absolute; pointer-events: none; user-select: none; z-index: 0; }
-.art.bottle { left: calc(1.4 * var(--u)); bottom: calc(.6 * var(--u)); width: calc(8.4 * var(--u)); }
-.art.feet { left: calc(10.8 * var(--u)); bottom: calc(1.2 * var(--u)); width: calc(4.8 * var(--u)); }
-.art.books { left: calc(16.4 * var(--u)); bottom: calc(.9 * var(--u)); width: calc(8.6 * var(--u)); }
-.art.line { right: calc(1.4 * var(--u)); bottom: calc(1 * var(--u)); width: calc(20 * var(--u)); }
-
-header {
-  position: relative; z-index: 2; flex: none;
-  padding: calc(4.6 * var(--u)) calc(4 * var(--u)) calc(1 * var(--u)) calc(4.4 * var(--u));
-  display: flex; align-items: flex-end; justify-content: space-between; gap: calc(2 * var(--u));
-}
-h1 { margin: 0; font: 400 max(30px, calc(5.6 * var(--u)))/1 var(--script); letter-spacing: .02em; }
-.sub { margin: calc(.6 * var(--u)) 0 0; font-size: max(13px, calc(1.7 * var(--u))); font-weight: 600; }
-.sub em { font-weight: 500; }
-
-.cta { position: relative; flex: none; }
-.cta .bear { position: absolute; width: calc(7.4 * var(--u)); left: 50%; bottom: calc(100% - calc(.9 * var(--u))); transform: translateX(-50%); pointer-events: none; }
-.add {
-  position: relative; font: 600 max(13px, calc(1.55 * var(--u)))/1 var(--serif); color: #fff; background: var(--navy);
-  border: 0; border-radius: 99px; padding: calc(.9 * var(--u)) calc(2.2 * var(--u)); cursor: pointer; white-space: nowrap;
-  box-shadow: 0 calc(.3 * var(--u)) 0 #12253f; transition: transform .12s, box-shadow .12s;
-}
-.add:hover { transform: translateY(calc(.1 * var(--u))); box-shadow: 0 calc(.2 * var(--u)) 0 #12253f; }
-.add:active { transform: translateY(calc(.3 * var(--u))); box-shadow: 0 0 0 #12253f; }
-:focus-visible { outline: calc(.25 * var(--u)) solid #4f7bbd; outline-offset: calc(.2 * var(--u)); }
-
-/* Wall */
-main {
-  position: relative; z-index: 1; flex: 1; overflow-y: auto; scrollbar-width: thin;
-  scrollbar-color: var(--gingham) transparent; padding: calc(2.4 * var(--u)) calc(4.4 * var(--u)) calc(15 * var(--u));
-}
-.wall { display: flex; align-items: flex-start; gap: calc(1.8 * var(--u)); }
-.col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-@container (max-width: 640px) {
-  header { flex-direction: column; align-items: flex-start; padding-top: calc(3 * var(--u)); }
-  .cta .bear { display: none; }
-}
-
-.note {
-  position: relative; margin: 0 0 calc(2 * var(--u)); padding: calc(1.7 * var(--u)) calc(1.4 * var(--u)) calc(1.1 * var(--u));
-  background: #fffdf8; border-radius: calc(.3 * var(--u)); box-shadow: 0 calc(.15 * var(--u)) calc(.5 * var(--u)) rgba(31,58,95,.18);
-  transform: rotate(var(--r, 0deg));
-}
-.note .tape { position: absolute; top: calc(-.7 * var(--u)); left: 50%; width: calc(5 * var(--u)); height: calc(1.5 * var(--u)); margin-left: calc(-2.5 * var(--u)); background: rgba(201,165,122,.45); transform: rotate(-2deg); pointer-events: none; }
-.note.sky { background: var(--sky); } .note.sand { background: var(--sand); } .note.periwinkle { background: var(--periwinkle); }
-.note p { margin: 0 0 calc(.9 * var(--u)); font-size: max(13px, calc(1.45 * var(--u))); line-height: 1.38; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; }
-.who { display: flex; justify-content: space-between; align-items: baseline; gap: calc(.6 * var(--u)); }
-.who b { font: 400 max(15px, calc(1.8 * var(--u)))/1.1 var(--script); }
-.who time { font-size: max(11px, calc(1.05 * var(--u))); opacity: .7; font-style: italic; }
-.note.new { animation: pop .5s cubic-bezier(.2,1.4,.4,1); }
-@keyframes pop { from { transform: scale(.85) rotate(var(--r)); opacity: 0; } }
-
-.trash { width: max(15px, calc(1.8 * var(--u))); height: max(15px, calc(1.8 * var(--u))); flex: none; padding: 0; margin-left: calc(.4 * var(--u));
-  display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: var(--navy); opacity: .3; cursor: pointer; transition: opacity .15s, color .15s; }
-.trash svg { width: 100%; height: 100%; }
-.trash:hover, .trash:focus-visible { opacity: .8; }
-.trash.armed { opacity: 1; color: #b04a4a; background: rgba(176,74,74,.12); }
-.empty { text-align: center; margin-top: calc(5 * var(--u)); font-size: max(15px, calc(2 * var(--u))); font-style: italic; }
-
-
-/* Dialogs */
-.overlay { position: absolute; inset: 0; z-index: 10; display: none; place-items: center; background: rgba(31,58,95,.35); backdrop-filter: blur(calc(.2 * var(--u))); }
-.overlay.open { display: grid; }
-form {
-  width: calc(46 * var(--u)); max-width: 94%; background: var(--cream); padding: calc(2 * var(--u)) calc(2.4 * var(--u)); border-radius: calc(.8 * var(--u));
-  border: calc(.35 * var(--u)) solid var(--gingham); box-shadow: 0 calc(1 * var(--u)) calc(3 * var(--u)) rgba(0,0,0,.3); font-size: max(13px, calc(1.4 * var(--u)));
-}
-form.small { width: calc(32 * var(--u)); }
-form h2 { margin: 0 0 calc(1 * var(--u)); font: 400 max(24px, calc(3 * var(--u)))/1 var(--script); }
-label { display: block; font-weight: 600; margin: calc(.9 * var(--u)) 0 calc(.3 * var(--u)); }
-textarea, input[type=text], input[type=password] {
-  width: 100%; font: 500 max(14px, calc(1.5 * var(--u)))/1.35 var(--serif); color: var(--navy);
-  border: calc(.15 * var(--u)) solid var(--gingham); border-radius: calc(.4 * var(--u)); padding: calc(.7 * var(--u)) calc(.9 * var(--u)); background: #fff;
-}
-textarea { height: calc(9 * var(--u)); resize: none; }
-input:disabled { background: #eee; opacity: .6; }
-.row { display: flex; align-items: center; justify-content: space-between; gap: calc(1 * var(--u)); flex-wrap: wrap; }
-.anon { display: flex; align-items: center; gap: calc(.5 * var(--u)); font-weight: 600; margin: calc(.9 * var(--u)) 0 calc(.3 * var(--u)); }
-.anon input { width: calc(1.3 * var(--u)); height: calc(1.3 * var(--u)); min-width: 14px; min-height: 14px; accent-color: var(--navy); }
-.swatches { display: flex; gap: calc(.7 * var(--u)); align-items: center; margin-top: calc(.9 * var(--u)); }
-.swatches label { margin: 0; }
-.swatches input { position: absolute; opacity: 0; }
-.swatches span { display: block; width: calc(2.2 * var(--u)); height: calc(2.2 * var(--u)); min-width: 22px; min-height: 22px; border-radius: 50%; border: calc(.2 * var(--u)) solid rgba(31,58,95,.25); cursor: pointer; }
-.swatches input:checked + span { border-color: var(--navy); box-shadow: 0 0 0 calc(.2 * var(--u)) #fff, 0 0 0 calc(.4 * var(--u)) var(--navy); }
-.swatches input:focus-visible + span { outline: calc(.25 * var(--u)) solid #4f7bbd; outline-offset: calc(.3 * var(--u)); }
-.count { font-size: .9em; opacity: .7; }
-.err { color: #a33; min-height: 1.4em; margin: calc(.4 * var(--u)) 0 0; font-weight: 600; }
-.actions { display: flex; justify-content: flex-end; gap: calc(1 * var(--u)); margin-top: calc(.6 * var(--u)); }
-.actions button { font: 600 max(14px, calc(1.5 * var(--u)))/1 var(--serif); border-radius: 99px; padding: calc(.8 * var(--u)) calc(1.8 * var(--u)); cursor: pointer; }
-.cancel { background: none; border: calc(.15 * var(--u)) solid var(--navy); color: var(--navy); }
-.send { background: var(--navy); color: #fff; border: calc(.15 * var(--u)) solid var(--navy); }
-.send:disabled { opacity: .6; cursor: wait; }
-
-.toast { position: absolute; left: 50%; bottom: calc(4 * var(--u)); z-index: 20; transform: translate(-50%, calc(4 * var(--u))); background: var(--navy); color: #fff; padding: calc(.9 * var(--u)) calc(2 * var(--u)); border-radius: 99px; font-size: max(14px, calc(1.5 * var(--u))); font-weight: 600; opacity: 0; transition: .35s; pointer-events: none; }
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
-@media (prefers-reduced-motion: reduce) { .note.new, .toast, .add { animation: none; transition: none; } }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Courier+Prime:wght@400;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pinyon+Script&family=Playfair+Display:wght@700&family=Sacramento&family=Yellowtail&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div class="root"><div class="stage"><div class="paper">
 
-  <img class="art bottle" src="bottle.png" alt="">
-  <img class="art feet" src="feet.png" alt="">
-  <img class="art books" src="books.png" alt="">
-  <img class="art line" src="clothesline.png" alt="">
+<header class="nav">
+  <nav aria-label="Main">
+    <a href="#/" data-route="home">Home</a>
+    <a href="#/details" data-route="details">Details</a>
+    <a href="#/prayer-registry" data-route="registry">Prayer Registry</a>
+    <a href="#/rsvp" data-route="rsvp">RSVP</a>
+  </nav>
+</header>
 
-  <header>
-    <div>
-      <h1>Prayer Registry</h1>
-      <p class="sub">for Uno Levine C. Chavez, at <em>Uno’s Dedication Ceremony</em></p>
+<main id="app">
+<noscript><p style="padding:2rem;text-align:center">Please turn on JavaScript to view this invitation.</p></noscript>
+
+<!-- ============================ HOME ============================ -->
+<section class="page home" data-page="home" aria-labelledby="home-title">
+  <div class="home__side home__side--left" aria-hidden="true">
+    <img class="a a-swag a-swag--top" src="assets/swag-top.png" alt="">
+    <img class="a a-moon" src="assets/moon-bear.png" alt="">
+    <img class="a a-bunny" src="assets/bunny-balloons.png" alt="">
+    <img class="a a-stroller-l" src="assets/stroller-left.png" alt="">
+  </div>
+
+  <div class="home__center">
+    <h1 class="home__title" id="home-title">Join Us as we Present our<br>little one to the Lord.</h1>
+    <div class="home__envelope-wrap">
+      <button class="envelope" id="envelope" type="button" aria-label="Open the invitation">
+        <img src="assets/envelope.png" alt="A gingham envelope sealed with a teddy bear and a tag that says “You are Invited”" width="552" height="403">
+      </button>
+      <p class="home__hint">Click the envelope to open</p>
     </div>
-    <div class="cta">
-      <img class="bear" src="bear.png" alt="">
-      <button class="add" id="open">Leave a prayer</button>
+    <img class="a-shoes" src="assets/shoes.png" alt="" aria-hidden="true">
+  </div>
+
+  <div class="home__side home__side--right" aria-hidden="true">
+    <img class="a a-lion" src="assets/lion.png" alt="">
+    <img class="a a-stroller-r" src="assets/stroller-right.png" alt="">
+    <img class="a a-dino" src="assets/dino.png" alt="">
+    <img class="a a-swag a-swag--bottom" src="assets/swag-bottom.png" alt="">
+  </div>
+</section>
+
+<!-- =========================== DETAILS =========================== -->
+<section class="page details" data-page="details" hidden aria-label="Invitation details">
+  <div class="details__col">
+
+    <!-- Invitation + location -->
+    <div class="scene scene--1">
+      <img class="p float-slow" style="--x:22;--y:45;--pw:186;--r:-8deg" src="assets/envelope-ultrasound.png" alt="An envelope lined with blue gingham, holding a baby ultrasound picture">
+      <img class="p twinkle" style="--x:238;--y:35;--pw:155" src="assets/star.png" alt="">
+      <img class="p" style="--x:108;--y:222;--pw:292" src="assets/invite-card.png" width="405" height="581"
+           alt="You are cordially invited to the Dedication Ceremony honoring Uno Levine C. Chavez. Saturday, November 7, at 5 o'clock in the afternoon. Corner Lot of Mindanao Extension, Commonwealth Ave, Quezon City, Metro Manila, Philippines. Please be there 30 minutes before 5 PM.">
+      <img class="p" style="--x:42;--y:505;--pw:112;--r:-8deg" src="assets/bottle.png" alt="">
+
+      <svg class="scene__svg" viewBox="0 0 430 930" aria-hidden="true" focusable="false">
+        <path d="M 207 724 C 196 694, 150 694, 150 722 C 150 736, 134 742, 121 756" fill="none" stroke="#7da1cf" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="5 6"/>
+        <path d="M 110 748 L 126 762 L 108 768 Z" fill="#7da1cf" stroke="#7da1cf" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+
+      <a class="p sign" style="--x:215;--y:716;--pw:168" href="https://www.google.com/maps/search/?api=1&query=14.7217646%2C121.0522609" target="_blank" rel="noopener" aria-label="Open the location in Google Maps">
+        <img src="assets/sign.png" alt=""><span>Tap the bear<br>for location</span>
+      </a>
+      <a class="p bear-link nudge" style="--x:38;--y:772;--pw:232" href="https://www.google.com/maps/search/?api=1&query=14.7217646%2C121.0522609" target="_blank" rel="noopener" aria-label="Tap the bear for the location (opens Google Maps)">
+        <img src="assets/car-bear.png" alt="A teddy bear driving a little blue car">
+      </a>
     </div>
-  </header>
 
-  <main><div class="wall" id="wall"></div><p class="empty" id="empty" hidden>No prayers yet. Be the first to write one for Uno.</p></main>
+    <!-- Prayer registry teaser -->
+    <div class="scene scene--2">
+      <img class="p" style="--x:252;--y:14;--pw:95;--r:12deg" src="assets/feet.png" alt="">
+      <img class="p" style="--x:60;--y:104;--pw:312" src="assets/easel.png" alt="An easel sign: Building our prayer registry. Share a prayer or blessing for our baby's spiritual journey.">
+      <p class="p label" style="--x:30;--y:482;--pw:200">Tap the books to write your prayers and wishes for Uno</p>
+      <a class="p books-link nudge" style="--x:232;--y:415;--pw:142" href="#/prayer-registry" aria-label="Open the prayer registry and write a prayer for Uno">
+        <img src="assets/books.png" alt="A stack of books titled “Prayers for Uno” with a teddy bear">
+      </a>
+      <img class="p" style="--x:30;--y:540;--pw:80;--r:-14deg" src="assets/feet.png" alt="">
+      <img class="p" style="--x:20;--y:596;--pw:392" src="assets/clothesline-bear.png" alt="">
+    </div>
 
-  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="dlg">
-    <form id="form" autocomplete="off">
-      <h2 id="dlg">Write a prayer for Uno</h2>
+    <!-- Music + RSVP -->
+    <div class="music">
+      <button class="vinyl" id="vinyl" type="button" aria-pressed="false" aria-label="Play or stop the music">
+        <img src="assets/vinyl.png" alt="" width="462" height="465">
+      </button>
+      <p class="music__caption">tap the vinyl to play and stop music</p>
+    </div>
+
+    <div class="rsvp-cta">
+      <p>We wish to know if you can make it. Please RSVP by October 20, 2026.</p>
+      <a class="rsvp-btn" href="#/rsvp"><span>RSVP HERE</span></a>
+    </div>
+
+    <div class="countdown" role="timer" aria-label="Countdown to the ceremony">
+      <p class="countdown__title" id="cd-title">Until the big day</p>
+      <div class="cd">
+        <div class="cd__unit"><span class="cd__num" id="cd-d">00</span><span class="cd__lbl">Days</span></div>
+        <span class="cd__sep" aria-hidden="true">:</span>
+        <div class="cd__unit"><span class="cd__num" id="cd-h">00</span><span class="cd__lbl">Hours</span></div>
+        <span class="cd__sep" aria-hidden="true">:</span>
+        <div class="cd__unit"><span class="cd__num" id="cd-m">00</span><span class="cd__lbl">Minutes</span></div>
+        <span class="cd__sep" aria-hidden="true">:</span>
+        <div class="cd__unit"><span class="cd__num cd__num--sec" id="cd-s">00</span><span class="cd__lbl">Seconds</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PRAYER REGISTRY ======================= -->
+<section class="page registry" data-page="registry" hidden aria-labelledby="reg-title">
+  <div class="registry__inner">
+    <header class="registry__head">
+      <div>
+        <h1 class="registry__title" id="reg-title">Prayer Registry</h1>
+        <p class="registry__sub">for Uno Levine C. Chavez, at <em>Uno’s Dedication Ceremony</em></p>
+      </div>
+      <div class="registry__cta">
+        <img class="registry__bear" src="assets/bear.png" alt="" aria-hidden="true">
+        <button class="btn" id="open-prayer" type="button">Leave a prayer</button>
+      </div>
+    </header>
+
+    <div class="wall" id="wall" aria-live="polite"></div>
+    <p class="empty" id="empty" hidden>No prayers yet. Be the first to write one for Uno.</p>
+    <p class="wall-status" id="wall-status" role="status"></p>
+
+    <div class="registry__decor" aria-hidden="true">
+      <img src="assets/bottle.png" alt="">
+      <img src="assets/feet.png" alt="">
+      <img src="assets/books.png" alt="">
+      <img class="decor-line" src="assets/clothesline.png" alt="">
+    </div>
+  </div>
+
+  <dialog id="prayer-dialog" aria-labelledby="dlg-title">
+    <form id="prayer-form" autocomplete="off">
+      <h2 id="dlg-title">Write a prayer for Uno</h2>
       <label for="msg">Your prayer</label>
-      <textarea id="msg" maxlength="600" required></textarea>
-      <div class="row"><span class="count" id="count">0 / 600</span></div>
+      <textarea id="msg" maxlength="600" rows="5" required></textarea>
+      <div class="count" id="count">0 / 600</div>
+
       <label for="name">Your name</label>
-      <input type="text" id="name" maxlength="40" placeholder="Optional">
+      <input type="text" id="name" maxlength="40" placeholder="Optional" autocomplete="off">
+
+      <!-- honeypot: real people never see or fill this -->
+      <div class="hp" aria-hidden="true"><label>Website <input type="text" id="website" tabindex="-1" autocomplete="off"></label></div>
+
       <div class="row">
         <label class="anon"><input type="checkbox" id="anon"> Post anonymously</label>
         <div class="swatches" role="radiogroup" aria-label="Note color">
@@ -181,117 +169,108 @@ input:disabled { background: #eee; opacity: .6; }
           <label><input type="radio" name="color" value="periwinkle"><span style="background:#dfe3f4" title="Periwinkle"></span></label>
         </div>
       </div>
+
       <p class="err" id="err" role="alert"></p>
       <div class="actions">
-        <button type="button" class="cancel" data-close>Cancel</button>
-        <button type="submit" class="send" id="send">Post prayer</button>
+        <button type="button" class="btn btn--ghost" id="cancel">Cancel</button>
+        <button type="submit" class="btn" id="send">Post prayer</button>
       </div>
     </form>
+  </dialog>
+</section>
+
+<!-- ============================ RSVP ============================ -->
+<section class="page rsvp" data-page="rsvp" hidden aria-labelledby="rsvp-title">
+  <div class="rsvp__inner">
+    <h1 class="rsvp__title" id="rsvp-title">Uno Levine’s Dedication Ceremony</h1>
+
+    <div class="rsvp__side">
+      <img class="rsvp__card" src="assets/rsvp-card.jpg" width="1240" height="1748"
+           alt="Our very special boy, Uno Levine. Dedication Ceremony, November 7, 2026, 5 PM.">
+
+      <div class="rsvp__actions">
+        <div class="rsvp__buttons">
+          <button class="rsvp__choice rsvp__choice--yes" id="rsvp-yes" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
+            <span>Attending</span>
+          </button>
+          <button class="rsvp__choice rsvp__choice--no" id="rsvp-no" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+            <span>Not Attending</span>
+          </button>
+        </div>
+        <div class="rsvp__mine" id="rsvp-mine" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="rsvp__info">
+      <div class="rsvp__when">
+        <div class="rsvp__date">Saturday, Nov 7</div>
+        <div class="rsvp__time">5:00 pm</div>
+      </div>
+
+      <a class="rsvp__where" href="https://www.google.com/maps/search/?api=1&query=14.7217646%2C121.0522609" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        <span>
+          <b>Jollibee Mindanao Ave</b>
+          <small>Corner Mindanao Extension, Commonwealth Ave, Quezon City, Metro Manila, Philippines</small>
+        </span>
+      </a>
+
+      <div class="rsvp__map">
+        <iframe title="Map showing the ceremony location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                src="https://maps.google.com/maps?q=14.7217646,121.0522609&amp;z=16&amp;output=embed"></iframe>
+      </div>
+
+      <p class="rsvp__note">Join us as we celebrate a new milestone in Uno Levine’s chapter.</p>
+      <p class="rsvp__note rsvp__note--deadline">Kindly reply by October 20, 2026. Please be there 30 minutes before 5 PM.</p>
+    </div>
+
+    <div class="rsvp__wall">
+      <h2 class="rsvp__wall-title">Guest Wall <span class="rsvp__going" id="rsvp-going" hidden></span></h2>
+      <div class="rsvp__wishes" id="rsvp-wishes" aria-live="polite">
+        <p class="rsvp__none" id="rsvp-none">No wishes yet. Be the first to share.</p>
+      </div>
+      <p class="wall-status" id="rsvp-status" role="status"></p>
+    </div>
   </div>
 
-  <div class="toast" id="toast" role="status"></div>
-</div></div></div>
+  <dialog id="rsvp-dialog" aria-labelledby="rsvp-dlg-title">
+    <form id="rsvp-form" autocomplete="off">
+      <h2 id="rsvp-dlg-title">We’ll be there!</h2>
+      <p class="rsvp__dlg-sub" id="rsvp-dlg-sub"></p>
 
-<script>
-const $ = id => document.getElementById(id);
-const wall = $('wall');
-let lastKey = '', firstLoad = true;
+      <label for="rsvp-name">Your name</label>
+      <input type="text" id="rsvp-name" maxlength="40" required autocomplete="name">
 
-function ago(iso) {
-  const s = (Date.now() - new Date(iso)) / 1000;
-  if (s < 60) return 'just now';
-  if (s < 3600) return Math.floor(s / 60) + ' min ago';
-  if (s < 86400) return Math.floor(s / 3600) + ' hr ago';
-  if (s < 604800) return Math.floor(s / 86400) + ' d ago';
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
-const rot = id => ((parseInt(id.slice(0, 4), 16) % 41) - 20) / 10 + 'deg';
-const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2800); };
+      <div id="rsvp-guests-wrap">
+        <label for="rsvp-guests">How many people are coming (including you)?</label>
+        <select id="rsvp-guests"></select>
+      </div>
 
-let current = [], lastCount = 0;
-function render(list, force) {
-  const key = list.map(n => n.id + (n.mine ? '*' : '')).join();
-  if (key === lastKey && !force) return;
-  const prev = new Set(lastKey.split(',').map(x => x.replace('*', '')));
-  lastKey = key; current = list;
-  wall.textContent = '';
-  const w = innerWidth, count = w > 1000 ? 4 : w > 700 ? 3 : w > 440 ? 2 : 1;
-  lastCount = count;
-  const cols = Array.from({ length: count }, () => { const c = document.createElement('div'); c.className = 'col'; wall.append(c); return c; });
-  list.forEach(n => {
-    const el = document.createElement('article');
-    el.className = 'note ' + n.color + (!firstLoad && !prev.has(n.id) ? ' new' : '');
-    el.style.setProperty('--r', rot(n.id));
-    const p = document.createElement('p'); p.textContent = n.message;
-    const who = document.createElement('div'); who.className = 'who';
-    const b = document.createElement('b'); b.textContent = n.name;
-    const t = document.createElement('time'); t.textContent = ago(n.createdAt); t.dateTime = n.createdAt;
-    who.append(b, t);
-    if (n.mine) who.append(trashButton(n.id));
-    const tape = document.createElement('i'); tape.className = 'tape';
-    el.append(tape, p, who);
-    cols.reduce((a, c) => (c.offsetHeight < a.offsetHeight ? c : a)).append(el);
-  });
-  $('empty').hidden = list.length > 0;
-  firstLoad = false;
-}
+      <label for="rsvp-msg">A wish or message for Uno <span class="opt">(optional)</span></label>
+      <textarea id="rsvp-msg" maxlength="300" rows="4"></textarea>
+      <div class="count" id="rsvp-count">0 / 300</div>
+      <p class="rsvp__hint">Your name and message will appear on the Guest Wall.</p>
 
-// Trash icon: only shown on notes this browser posted. First click arms it, second deletes.
-function trashButton(id) {
-  const b = document.createElement('button');
-  b.className = 'trash'; b.title = 'Delete my prayer'; b.setAttribute('aria-label', 'Delete my prayer');
-  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
-  let timer;
-  b.onclick = async () => {
-    if (!b.classList.contains('armed')) {
-      b.classList.add('armed'); b.title = 'Click again to delete';
-      timer = setTimeout(() => { b.classList.remove('armed'); b.title = 'Delete my prayer'; }, 3000);
-      return;
-    }
-    clearTimeout(timer); b.disabled = true;
-    try {
-      const r = await fetch('/api/prayers?id=' + id, { method: 'DELETE' });
-      toast(r.ok ? 'Your prayer was deleted.' : 'You can only delete prayers posted from this browser.');
-    } catch { toast('Could not delete. Please try again.'); }
-    load(true);
-  };
-  return b;
-}
+      <!-- honeypot: real people never see or fill this -->
+      <div class="hp" aria-hidden="true"><label>Website <input type="text" id="rsvp-website" tabindex="-1" autocomplete="off"></label></div>
 
-async function load(force) {
-  try { render(await (await fetch('/api/prayers', { cache: 'no-store' })).json(), force); } catch {}
-}
+      <p class="err" id="rsvp-err" role="alert"></p>
+      <div class="actions">
+        <button type="button" class="btn btn--ghost" id="rsvp-cancel">Cancel</button>
+        <button type="submit" class="btn" id="rsvp-send">Confirm</button>
+      </div>
+    </form>
+  </dialog>
+</section>
+</main>
 
-/* ---------- dialogs ---------- */
-const open = el => { el.classList.add('open'); };
-const closeAll = () => { document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open')); $('err').textContent = ''; };
-$('open').onclick = () => { open($('overlay')); $('msg').focus(); };
-document.querySelectorAll('[data-close]').forEach(b => b.onclick = closeAll);
-document.querySelectorAll('.overlay').forEach(o => o.addEventListener('mousedown', e => { if (e.target === o) closeAll(); }));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
-$('msg').oninput = e => $('count').textContent = e.target.value.length + ' / 600';
-$('anon').onchange = e => { $('name').disabled = e.target.checked; if (e.target.checked) $('name').value = ''; };
+<audio id="bgm" loop preload="none">
+  <source src="assets/music.mp3" type="audio/mpeg">
+</audio>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-$('form').onsubmit = async e => {
-  e.preventDefault();
-  const msg = $('msg').value.trim();
-  if (!msg) { $('err').textContent = 'Please write a prayer first.'; return; }
-  $('send').disabled = true;
-  try {
-    const r = await fetch('/api/prayers', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, name: $('name').value, anonymous: $('anon').checked,
-        color: document.querySelector('input[name=color]:checked').value }) });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error || 'Could not post. Please try again.');
-    $('form').reset(); $('name').disabled = false; $('count').textContent = '0 / 600';
-    closeAll(); await load(); toast('Your prayer was posted. Thank you!');
-    document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
-  } catch (err) { $('err').textContent = err.message; }
-  $('send').disabled = false;
-};
-
-addEventListener('resize', () => { const w = innerWidth, c = w > 1000 ? 4 : w > 700 ? 3 : w > 440 ? 2 : 1; if (c !== lastCount) render(current, true); });
-load(); setInterval(load, 20000);
-</script>
+<script src="js/app.js"></script>
 </body>
 </html>
