@@ -26,6 +26,25 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
   }
 
+  /* ------------------------------ menu (phones) ------------------------------ */
+  const nav = $('#nav'), toggle = $('#nav-toggle'), scrim = $('#nav-scrim');
+  const desktop = matchMedia('(min-width: 880px)');
+  function setMenu(open, returnFocus = true) {
+    nav.classList.toggle('is-open', open);
+    document.body.classList.toggle('menu-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (open) $('#menu a[aria-current="page"], #menu a').focus({ preventScroll: true });
+    else if (returnFocus && !desktop.matches) toggle.focus({ preventScroll: true });
+  }
+  toggle.addEventListener('click', () => setMenu(!nav.classList.contains('is-open')));
+  $('#menu-close').addEventListener('click', () => setMenu(false));
+  scrim.addEventListener('click', () => setMenu(false));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('is-open')) setMenu(false); });
+  desktop.addEventListener('change', () => setMenu(false, false));
+  // tapping the link of the page you are already on does not change the hash, so close the menu here too
+  $$('#menu a').forEach(a => a.addEventListener('click', () => setMenu(false, false)));
+
   /* ------------------------------- router ------------------------------- */
   const ROUTES = { '': 'home', '/': 'home', '/details': 'details', '/prayer-registry': 'registry', '/rsvp': 'rsvp' };
   const TITLES = {
@@ -39,12 +58,13 @@
   function route() {
     const page = currentPage();
     $$('.page').forEach(p => { p.hidden = p.dataset.page !== page; });
-    $$('.nav a').forEach(a => {
+    $$('#menu a').forEach(a => {
       if (a.dataset.route === page) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
     document.title = TITLES[page];
     if (page === 'home') $('#envelope').classList.remove('is-opening');
+    setMenu(false, false);
     window.scrollTo(0, 0);
     registry.setActive(page === 'registry');
     rsvp.setActive(page === 'rsvp');
@@ -215,44 +235,10 @@
     const dlg = $('#rsvp-dialog');
     const form = $('#rsvp-form');
     const MAX_GUESTS = 10;
-    let timer = null, mine = [], lastWishKey = '', firstLoad = true, attending = true;
+    let mine = [], attending = true;
 
     // guests dropdown: 1..10
     $('#rsvp-guests').innerHTML = Array.from({ length: MAX_GUESTS }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
-
-    const ago = iso => {
-      const s = (Date.now() - new Date(iso)) / 1000;
-      if (s < 60) return 'just now';
-      if (s < 3600) return Math.floor(s / 60) + ' min ago';
-      if (s < 86400) return Math.floor(s / 3600) + ' hr ago';
-      if (s < 604800) return Math.floor(s / 86400) + ' d ago';
-      return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    };
-
-    function renderWishes(list) {
-      const key = list.map(w => w.id + w.createdAt).join();
-      if (key === lastWishKey) return;
-      const prev = new Set(lastWishKey.split(','));
-      lastWishKey = key;
-      const box = $('#rsvp-wishes');
-      box.textContent = '';
-      if (!list.length) {
-        const p = document.createElement('p'); p.className = 'rsvp__none'; p.id = 'rsvp-none';
-        p.textContent = 'No wishes yet. Be the first to share.';
-        box.append(p);
-      }
-      list.forEach(w => {
-        const el = document.createElement('article');
-        el.className = 'wish' + (!firstLoad && !prev.has(w.id + w.createdAt) ? ' new' : '');
-        const p = document.createElement('p'); p.textContent = w.message;
-        const who = document.createElement('div'); who.className = 'who';
-        const b = document.createElement('b'); b.textContent = w.name;
-        const t = document.createElement('time'); t.textContent = ago(w.createdAt); t.dateTime = w.createdAt;
-        who.append(b, t);
-        el.append(p, who);
-        box.append(el);
-      });
-    }
 
     function renderMine() {
       const box = $('#rsvp-mine');
@@ -274,25 +260,14 @@
       }
     }
 
-    function renderGoing(n) {
-      const g = $('#rsvp-going');
-      g.hidden = !n;
-      g.textContent = n + ' going';
-    }
-
+    // Only asks the server for THIS browser's own replies (so the buttons can show what you answered).
     async function load() {
-      const status = $('#rsvp-status');
       try {
         const r = await fetch(CONFIG.rsvpApi, { cache: 'no-store' });
         if (!r.ok) throw new Error('bad status');
-        const d = await r.json();
-        mine = d.mine || [];
-        renderGoing(d.going || 0); renderWishes(d.wishes || []); renderMine();
-        firstLoad = false;
-        status.textContent = '';
-      } catch {
-        if (firstLoad) status.textContent = "Couldn't load the guest wall just now. Trying again…";
-      }
+        mine = (await r.json()).mine || [];
+        renderMine();
+      } catch { /* not important: the buttons still work */ }
     }
 
     /* dialog */
@@ -343,12 +318,9 @@
     };
 
     return {
-      // Only refresh while the RSVP page is on screen (and the tab is visible) — saves reads.
+      // Load this browser's own replies once, when the RSVP page opens.
       setActive(on) {
-        clearInterval(timer);
-        if (!on) return;
-        load();
-        timer = setInterval(() => { if (!document.hidden) load(); }, CONFIG.pollMs);
+        if (on) load();
       },
     };
   })();

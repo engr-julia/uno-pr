@@ -4,20 +4,21 @@ PAGES (all in public/index.html, switched with the address hash)
   #/                  Home: click the envelope
   #/details           Details: invitation, map, prayer registry link, music, RSVP link, countdown
   #/prayer-registry   Prayer Registry: guests leave notes
-  #/rsvp              RSVP: Attending / Not Attending, guest count, a wish for Uno, and the Guest Wall
+  #/rsvp              RSVP: Attending / Not Attending, guest count and an optional private message (no public wall)
 
 FOLDER
   public/index.html        page structure
   public/css/styles.css    all styling
-  public/js/app.js         router, countdown, music, prayer wall   (settings at the top: CONFIG)
+  public/js/app.js         router, menu, countdown, music, prayer wall, RSVP   (settings at the top: CONFIG)
+  public/fonts/            the site's fonts, hosted with the site (works offline, no Google Fonts)
   public/assets/           all artwork. Replace any PNG with a sharper original of the SAME filename.
   api/prayers.js           backend for the Prayer Registry (list, post, delete)
-  api/rsvp.js              backend for the RSVP page (list, post)
+  api/rsvp.js              backend for the RSVP page (post, and read back your own reply)
   local.js                 run on your computer
   package.json             needs @vercel/blob
 
 THINGS TO DO
-  1. MUSIC: put your song at public/assets/music.mp3 (until then the vinyl shows "music isn't available").
+  1. MUSIC: public/assets/music.mp3 is already in place (Steadfast Love, piano). To change it, replace that file (same name).
   2. MAP: every map link and the RSVP page's embedded map use the exact pin 14.7217646,121.0522609
      (Jollibee Mindanao Ave). To change it, search public/index.html for "14.7217646".
   3. DATE/TIME: change eventDate in public/js/app.js (CONFIG) for the countdown.
@@ -43,9 +44,9 @@ RSVP RULES
   - Replies live in ONE text file (rsvps.txt), one JSON line per reply:
       name, attending (true/false), guests, message, createdAt
     "guests" is the number of people coming (1-10, including the person replying). Add up the
-    guests of the attending lines for your headcount. The page shows that total as "N going".
-  - The Guest Wall shows only the name + message of replies that include a message. Nobody can see
-    anyone else's attendance, guest count or whether they said yes or no.
+    guests of the attending lines for your headcount. Add them up for your headcount.
+  - There is no public guest wall. A guest only ever sees their own reply on their own browser;
+    their message is read by you in rsvps.txt.
   - Sending again from the same browser with the SAME name changes that reply (no duplicates).
     A different name from the same browser adds another reply, so one phone can answer for a family.
   - Limits (top of api/rsvp.js): 10 replies per browser, 300 in total, 10 guests per reply,

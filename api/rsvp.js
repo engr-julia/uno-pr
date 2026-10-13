@@ -60,20 +60,16 @@ async function update(change) {
   }
 }
 
-// What the browser is allowed to see: the headcount, the wishes (name + message only),
-// and the replies that came from THIS browser. Nobody else's reply is ever sent.
+// What the browser is allowed to see: ONLY the replies that came from THIS browser.
+// Nobody else's name, answer or message is ever sent (there is no public guest wall).
 export async function GET(req) {
   const ownerId = getOwner(req);
   const me = ownerId && sha(ownerId);
   let rows;
   try { ({ rows } = await read()); }
-  catch (e) { console.error('rsvp: read failed', e); return json({ error: 'Could not load replies.' }, 500); }
+  catch (e) { console.error('rsvp: read failed', e); return json({ error: 'Could not load your reply.' }, 500); }
   const newest = [...rows].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-  return json({
-    going: rows.reduce((n, r) => n + (r.attending ? r.guests : 0), 0),
-    wishes: newest.filter(r => r.message).map(r => ({ id: r.id, name: r.name, message: r.message, createdAt: r.createdAt })),
-    mine: me ? newest.filter(r => r.owner === me).map(({ owner, ...r }) => r) : [],
-  });
+  return json({ mine: me ? newest.filter(r => r.owner === me).map(({ owner, ...r }) => r) : [] });
 }
 
 export async function POST(req) {
