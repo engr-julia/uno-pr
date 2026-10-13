@@ -12,6 +12,7 @@ FOLDER
   public/js/app.js         router, menu, countdown, music, prayer wall, RSVP   (settings at the top: CONFIG)
   public/fonts/            the site's fonts, hosted with the site (works offline, no Google Fonts)
   public/assets/           all artwork. Replace any PNG with a sharper original of the SAME filename.
+                             (Cut from the PDF's clipart sheets and upscaled 4x; originals would be sharper still.)
   api/prayers.js           backend for the Prayer Registry (list, post, delete)
   api/rsvp.js              backend for the RSVP page (post, and read back your own reply)
   local.js                 run on your computer
@@ -19,6 +20,9 @@ FOLDER
 
 THINGS TO DO
   1. MUSIC: public/assets/music.mp3 is already in place (Steadfast Love, piano). To change it, replace that file (same name).
+     It starts when a guest taps the envelope (or the Details link in the menu) and keeps playing across pages.
+     Browsers block sound until a tap, so a guest who opens #/details directly starts it with their first tap.
+     If a guest stops it with the vinyl, it stays off until they tap the vinyl again.
   2. MAP: every map link and the RSVP page's embedded map use the exact pin 14.7217646,121.0522609
      (Jollibee Mindanao Ave). To change it, search public/index.html for "14.7217646".
   3. DATE/TIME: change eventDate in public/js/app.js (CONFIG) for the countdown.

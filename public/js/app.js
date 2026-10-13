@@ -43,7 +43,7 @@
   addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('is-open')) setMenu(false); });
   desktop.addEventListener('change', () => setMenu(false, false));
   // tapping the link of the page you are already on does not change the hash, so close the menu here too
-  $$('#menu a').forEach(a => a.addEventListener('click', () => setMenu(false, false)));
+  $$('#menu a').forEach(a => a.addEventListener('click', () => { setMenu(false, false); if (a.dataset.route === 'details') startMusic(); }));
 
   /* ------------------------------- router ------------------------------- */
   const ROUTES = { '': 'home', '/': 'home', '/details': 'details', '/prayer-registry': 'registry', '/rsvp': 'rsvp' };
@@ -75,6 +75,7 @@
     const env = e.currentTarget;
     if (env.classList.contains('is-opening')) return;
     env.classList.add('is-opening');
+    startMusic();   // a tap may start audio, so the music begins as the invitation opens
     setTimeout(() => { location.hash = '#/details'; }, reduceMotion ? 0 : 850);
   });
 
@@ -96,8 +97,18 @@
   /* ------------------------------- music ------------------------------- */
   const audio = $('#bgm');
   const vinyl = $('#vinyl');
+  let musicStopped = false;   // true once the guest has stopped the music themselves
+  function startMusic() {
+    if (musicStopped || !audio.paused) return;
+    audio.play().catch(() => {});   // blocked? the first tap on Details starts it (below)
+  }
+  ['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, function once() {
+    if (currentPage() === 'details') startMusic();
+    if (!audio.paused) removeEventListener(ev, once);
+  }, { passive: true }));
   vinyl.addEventListener('click', async () => {
-    if (!audio.paused) { audio.pause(); return; }
+    if (!audio.paused) { musicStopped = true; audio.pause(); return; }
+    musicStopped = false;
     try { await audio.play(); }
     catch { toast("The music isn't available right now."); }
   });
