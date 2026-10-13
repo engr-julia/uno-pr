@@ -13,7 +13,7 @@
     // Email notification for every RSVP (Web3Forms, free). Get your key at https://web3forms.com
     // (type engr.julia.rt@gmail.com, the key arrives by email) and paste it below.
     // Leave it empty and the RSVPs are still saved to rsvps.txt, just without the email.
-    web3formsKey: '',
+    web3formsKey: 'bf6fa12f-88a0-401f-8dd3-6bd8858b478a',
     pollMs: 20000,                             // how often the registry refreshes while open
   };
 
