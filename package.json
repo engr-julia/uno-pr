@@ -1,0 +1,11 @@
+{
+  "name": "prayer-registry",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/blob": "latest"
+  },
+  "scripts": {
+    "start": "node local.js"
+  }
+}
