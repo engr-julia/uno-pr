@@ -36,6 +36,17 @@ DEPLOY ON VERCEL
   2. Storage tab > Create Storage > Blob > access PRIVATE > connect to the project. Redeploy.
   3. View/download prayers.txt and rsvps.txt: Vercel dashboard > Storage > your Blob store.
 
+RSVP EMAIL NOTIFICATIONS (Web3Forms)
+  Every RSVP is also emailed to you (engr.julia.rt@gmail.com) with the name, answer, number of guests and message.
+  1. Go to https://web3forms.com, type engr.julia.rt@gmail.com and press "Create Access Key".
+     The key is emailed to you (free plan: 250 emails a month, no sign-up needed).
+  2. Paste it into web3formsKey at the top of public/js/app.js (CONFIG), then redeploy.
+  3. Send a test RSVP. The first email may land in Spam: mark it "Not spam".
+  The key is meant to be public (it can only SEND to your address). The email is sent from the guest's browser
+  because Web3Forms' free plan does not allow server-side sends. If the email fails, the RSVP is still saved in
+  rsvps.txt, and guests are never shown an error for it. rsvps.txt stays your source of truth.
+  Optional hardening: in the Web3Forms dashboard turn on domain restriction (paid plan) once your site is live.
+
 PRAYER REGISTRY RULES
   - All prayers live in ONE text file (prayers.txt), one note per line.
   - Each browser gets a random cookie; only that browser sees the trash icon on its own notes

@@ -10,6 +10,10 @@
     eventDate: '2026-11-07T17:00:00+08:00',   // Nov 7, 2026 · 5:00 PM Philippine time
     prayersApi: '/api/prayers',
     rsvpApi: '/api/rsvp',
+    // Email notification for every RSVP (Web3Forms, free). Get your key at https://web3forms.com
+    // (type engr.julia.rt@gmail.com, the key arrives by email) and paste it below.
+    // Leave it empty and the RSVPs are still saved to rsvps.txt, just without the email.
+    web3formsKey: 'bf6fa12f-88a0-401f-8dd3-6bd8858b478a',
     pollMs: 20000,                             // how often the registry refreshes while open
   };
 
@@ -305,6 +309,30 @@
     dlg.addEventListener('click', e => { if (e.target === dlg) closeDialog(); });
     $('#rsvp-msg').oninput = e => { $('#rsvp-count').textContent = e.target.value.length + ' / 300'; };
 
+    // Emails the reply to the host through Web3Forms. Runs AFTER the reply is saved and never
+    // blocks or breaks the guest's RSVP: if it fails, the reply is still safe in rsvps.txt.
+    async function emailReply({ name, attending, guests, message }) {
+      if (!CONFIG.web3formsKey) return;
+      const when = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' });
+      try {
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: CONFIG.web3formsKey,
+            subject: `RSVP: ${name} — ${attending ? 'Attending (' + guests + ')' : 'Not attending'}`,
+            from_name: "Uno's Dedication Invitation",
+            Name: name,
+            Response: attending ? 'Attending' : 'Not attending',
+            'Number of guests': attending ? String(guests) : '0',
+            Message: message || '(no message)',
+            'Sent (Philippine time)': when,
+            botcheck: '',                       // Web3Forms' own spam trap, must stay empty
+          }),
+        });
+      } catch { /* offline or blocked: ignore, the reply is already saved */ }
+    }
+
     form.onsubmit = async e => {
       e.preventDefault();
       const err = $('#rsvp-err');
@@ -321,6 +349,7 @@
         });
         const data = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(data.error || 'Could not send. Please try again.');
+        emailReply({ name, attending, guests: Number($('#rsvp-guests').value), message: $('#rsvp-msg').value.trim() });
         form.reset(); $('#rsvp-count').textContent = '0 / 300';
         closeDialog(); await load();
         toast(attending ? 'Thank you! See you there.' : 'Thank you for letting us know.');
