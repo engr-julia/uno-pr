@@ -1,47 +1,54 @@
-PRAYER REGISTRY — Uno's Dedication Ceremony  (Vercel version)
+UNO'S DEDICATION CEREMONY — INVITATION WEBSITE  (Vercel version)
+
+PAGES (all in public/index.html, switched with the address hash)
+  #/                  Home: click the envelope
+  #/details           Details: invitation, map, prayer registry link, music, RSVP link, countdown
+  #/prayer-registry   Prayer Registry: guests leave notes
+  #/rsvp              RSVP: Attending / Not Attending, guest count, a wish for Uno, and the Guest Wall
 
 FOLDER
-  public/index.html     the website (+ images)
-  api/prayers.js        the backend (list, post, delete)
-  package.json          needs @vercel/blob
+  public/index.html        page structure
+  public/css/styles.css    all styling
+  public/js/app.js         router, countdown, music, prayer wall   (settings at the top: CONFIG)
+  public/assets/           all artwork. Replace any PNG with a sharper original of the SAME filename.
+  api/prayers.js           backend for the Prayer Registry (list, post, delete)
+  api/rsvp.js              backend for the RSVP page (list, post)
+  local.js                 run on your computer
+  package.json             needs @vercel/blob
 
-RUN ON YOUR COMPUTER (no Vercel needed)
-  1. Install Node.js (LTS) from nodejs.org.
-  2. Open this folder in VS Code, then Terminal > New Terminal.
-  3. Run:   node local.js
-  4. Open http://localhost:3000
-  Prayers are saved in prayers.txt in this folder. Stop with Ctrl+C.
+THINGS TO DO
+  1. MUSIC: put your song at public/assets/music.mp3 (until then the vinyl shows "music isn't available").
+  2. MAP: every map link and the RSVP page's embedded map use the exact pin 14.7217646,121.0522609
+     (Jollibee Mindanao Ave). To change it, search public/index.html for "14.7217646".
+  3. DATE/TIME: change eventDate in public/js/app.js (CONFIG) for the countdown.
 
-HOW IT WORKS
-  - All prayers are kept in ONE text file, prayers.txt (one note per line): in a Vercel Blob store
-    when deployed, or in this folder when you run locally.
-  - Anyone can post, with a name or anonymously.
-  - Each browser gets a random cookie when it first posts. Only that browser sees a small
-    trash icon on its own notes and can delete them (click twice to confirm).
-    The file stores only a hash of the cookie, never the cookie itself.
+RUN ON YOUR COMPUTER
+  1. Install Node.js (LTS).  2. In this folder run:  node local.js  3. Open http://localhost:3000
+  Prayers are saved in prayers.txt and RSVPs in rsvps.txt in this folder. Stop with Ctrl+C.
 
 DEPLOY ON VERCEL
-  1. Create a Vercel project from this folder (push to GitHub, or run:  npx vercel --prod).
-     Framework preset: "Other".
-  2. In the project: Storage tab > Create Storage > Blob > set access to PRIVATE >
-     connect it to the project (Production + Preview, and Development if testing locally).
-  3. Redeploy so the project picks up the storage connection.
-  4. To view/download prayers.txt: Vercel dashboard > Storage > your Blob store.
+  1. Create a Vercel project from this folder (push to GitHub, or: npx vercel --prod). Framework preset: "Other".
+  2. Storage tab > Create Storage > Blob > access PRIVATE > connect to the project. Redeploy.
+  3. View/download prayers.txt and rsvps.txt: Vercel dashboard > Storage > your Blob store.
 
-TEST WITH THE REAL VERCEL STORAGE LOCALLY (optional)
-  npm install
-  npx vercel link
-  npx vercel env pull
-  npx vercel dev          then open http://localhost:3000
-
-EMBED (16:9)
-  <div style="position:relative;width:100%;aspect-ratio:16/9;">
-    <iframe src="https://YOUR-PROJECT.vercel.app/" title="Prayer Registry"
-      style="position:absolute;inset:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
-  </div>
-
-NOTES
-  - Safari blocks cookies in embedded pages, so in Safari inside the embed people can post
-    but won't see the trash icon. Opening the site directly works everywhere.
+PRAYER REGISTRY RULES
+  - All prayers live in ONE text file (prayers.txt), one note per line.
+  - Each browser gets a random cookie; only that browser sees the trash icon on its own notes
+    (tap twice to delete). The file stores only a hash of the cookie.
+  - Limits (top of api/prayers.js): 10 prayers per browser, 500 in total, 600 characters each.
+  - A hidden honeypot field blocks simple bots. To remove a guest's note yourself, edit prayers.txt in the Blob store.
   - Clearing cookies / switching browser means a person can no longer delete their old notes.
-  - Add a rate-limit rule in Vercel Firewall if you want spam protection.
+
+RSVP RULES
+  - Replies live in ONE text file (rsvps.txt), one JSON line per reply:
+      name, attending (true/false), guests, message, createdAt
+    "guests" is the number of people coming (1-10, including the person replying). Add up the
+    guests of the attending lines for your headcount. The page shows that total as "N going".
+  - The Guest Wall shows only the name + message of replies that include a message. Nobody can see
+    anyone else's attendance, guest count or whether they said yes or no.
+  - Sending again from the same browser with the SAME name changes that reply (no duplicates).
+    A different name from the same browser adds another reply, so one phone can answer for a family.
+  - Limits (top of api/rsvp.js): 10 replies per browser, 300 in total, 10 guests per reply,
+    40 characters for the name, 300 for the message. The same hidden honeypot as the registry blocks bots.
+  - Guests cannot delete a reply; to remove one yourself, edit rsvps.txt in the Blob store.
+  - The RSVP deadline (Oct 20, 2026) is only a note on the page. Replies are not blocked after it.
