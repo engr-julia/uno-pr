@@ -13,7 +13,7 @@
     // Email notification for every RSVP (Web3Forms, free). Get your key at https://web3forms.com
     // (type engr.julia.rt@gmail.com, the key arrives by email) and paste it below.
     // Leave it empty and the RSVPs are still saved to rsvps.txt, just without the email.
-    web3formsKey: 'bf6fa12f-88a0-401f-8dd3-6bd8858b478a',
+    web3formsKey: '',
     pollMs: 20000,                             // how often the registry refreshes while open
   };
 
@@ -249,69 +249,57 @@
   const rsvp = (() => {
     const dlg = $('#rsvp-dialog');
     const form = $('#rsvp-form');
-    const MAX_GUESTS = 10;
-    let mine = [], attending = true;
+    const yes = $('#rsvp-yes'), no = $('#rsvp-no');
+    let mine = [], attending = true, sending = false;
 
-    // guests dropdown: 1..10
-    $('#rsvp-guests').innerHTML = Array.from({ length: MAX_GUESTS }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
-
+    // One reply per browser. Once this browser has replied, both buttons are switched off and
+    // the page just shows what was sent. (The server enforces the same rule.)
     function renderMine() {
       const box = $('#rsvp-mine');
       box.textContent = '';
       const last = mine[0];
-      $('#rsvp-yes').setAttribute('aria-pressed', String(!!last && last.attending));
-      $('#rsvp-no').setAttribute('aria-pressed', String(!!last && !last.attending));
-      mine.forEach(r => {
-        const line = document.createElement('div');
-        line.textContent = (r.attending ? '✓ ' : '✗ ') + r.name + (r.attending
-          ? ' · attending' + (r.guests > 1 ? ' (' + r.guests + ' people)' : '')
-          : ' · not attending');
-        box.append(line);
-      });
-      if (mine.length) {
-        const hint = document.createElement('small');
-        hint.textContent = 'Need to change your reply? Tap a button and send it again with the same name.';
-        box.append(hint);
-      }
+      const done = !!last;
+      for (const btn of [yes, no]) btn.disabled = done;
+      yes.setAttribute('aria-pressed', String(done && last.attending));
+      no.setAttribute('aria-pressed', String(done && !last.attending));
+      if (!done) return;
+      const line = document.createElement('div');
+      line.textContent = (last.attending ? '✓ ' : '✗ ') + last.name + (last.attending ? ' · attending' : ' · not attending');
+      const note = document.createElement('small');
+      note.textContent = 'Thank you! Your reply has been sent. Each guest can reply once.';
+      box.append(line, note);
     }
 
-    // Only asks the server for THIS browser's own replies (so the buttons can show what you answered).
+    // Only asks the server for THIS browser's own reply (nobody else's is ever sent).
     async function load() {
       try {
         const r = await fetch(CONFIG.rsvpApi, { cache: 'no-store' });
         if (!r.ok) throw new Error('bad status');
         mine = (await r.json()).mine || [];
         renderMine();
-      } catch { /* not important: the buttons still work */ }
+      } catch { /* not important: the server still refuses a second reply */ }
     }
 
     /* dialog */
     function openDialog(isAttending) {
+      if (mine.length) return;                       // already replied
       attending = isAttending;
-      const last = mine[0];
       $('#rsvp-dlg-title').textContent = isAttending ? 'We’ll be there!' : 'Sorry we’ll miss you';
       $('#rsvp-dlg-sub').textContent = isAttending ? 'Let us know who’s coming.' : 'Thank you for letting us know.';
-      $('#rsvp-guests-wrap').hidden = !isAttending;
       $('#rsvp-send').textContent = isAttending ? 'Confirm' : 'Send reply';
-      if (last) {
-        $('#rsvp-name').value = last.name;
-        $('#rsvp-msg').value = last.message || '';
-        if (isAttending) $('#rsvp-guests').value = String(last.guests || 1);
-        $('#rsvp-count').textContent = $('#rsvp-msg').value.length + ' / 300';
-      }
       dlg.showModal();
       $('#rsvp-name').focus();
     }
     const closeDialog = () => { dlg.close(); $('#rsvp-err').textContent = ''; };
-    $('#rsvp-yes').onclick = () => openDialog(true);
-    $('#rsvp-no').onclick = () => openDialog(false);
+    yes.onclick = () => openDialog(true);
+    no.onclick = () => openDialog(false);
     $('#rsvp-cancel').onclick = closeDialog;
     dlg.addEventListener('click', e => { if (e.target === dlg) closeDialog(); });
     $('#rsvp-msg').oninput = e => { $('#rsvp-count').textContent = e.target.value.length + ' / 300'; };
 
     // Emails the reply to the host through Web3Forms. Runs AFTER the reply is saved and never
     // blocks or breaks the guest's RSVP: if it fails, the reply is still safe in rsvps.txt.
-    async function emailReply({ name, attending, guests, message }) {
+    async function emailReply({ name, attending, message }) {
       if (!CONFIG.web3formsKey) return;
       const when = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' });
       try {
@@ -320,11 +308,10 @@
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({
             access_key: CONFIG.web3formsKey,
-            subject: `RSVP: ${name} — ${attending ? 'Attending (' + guests + ')' : 'Not attending'}`,
+            subject: `RSVP: ${name} — ${attending ? 'Attending' : 'Not attending'}`,
             from_name: "Uno's Dedication Invitation",
             Name: name,
             Response: attending ? 'Attending' : 'Not attending',
-            'Number of guests': attending ? String(guests) : '0',
             Message: message || '(no message)',
             'Sent (Philippine time)': when,
             botcheck: '',                       // Web3Forms' own spam trap, must stay empty
@@ -335,30 +322,37 @@
 
     form.onsubmit = async e => {
       e.preventDefault();
+      if (sending || mine.length) return;            // double-tap guard
       const err = $('#rsvp-err');
       const name = $('#rsvp-name').value.trim();
       if (!name) { err.textContent = 'Please enter your name.'; return; }
-      $('#rsvp-send').disabled = true;
+      sending = true; $('#rsvp-send').disabled = true;
       try {
+        const message = $('#rsvp-msg').value;
         const r = await fetch(CONFIG.rsvpApi, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name, attending, guests: Number($('#rsvp-guests').value),
-            message: $('#rsvp-msg').value, website: $('#rsvp-website').value,
-          }),
+          body: JSON.stringify({ name, attending, message, website: $('#rsvp-website').value }),
         });
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) { console.error('Save failed:', r.status, data.code, data.detail); throw new Error(data.error || 'Could not send. Please try again.'); }
-        emailReply({ name, attending, guests: Number($('#rsvp-guests').value), message: $('#rsvp-msg').value.trim() });
-        form.reset(); $('#rsvp-count').textContent = '0 / 300';
-        closeDialog(); await load();
-        toast(attending ? 'Thank you! See you there.' : 'Thank you for letting us know.');
+        if (r.status === 409) {                      // this browser already replied (other tab / earlier visit)
+          form.reset(); $('#rsvp-count').textContent = '0 / 300';
+          closeDialog(); await load();
+          toast('You have already replied. Thank you!');
+        } else {
+          if (!r.ok) { console.error('Save failed:', r.status, data.code, data.detail); throw new Error(data.error || 'Could not send. Please try again.'); }
+          emailReply({ name, attending, message: message.trim() });
+          mine = [data]; renderMine();               // switch the buttons off right away
+          form.reset(); $('#rsvp-count').textContent = '0 / 300';
+          closeDialog();
+          toast(attending ? 'Thank you! See you there.' : 'Thank you for letting us know.');
+          load();                                    // then confirm with the server
+        }
       } catch (ex) { err.textContent = ex.message; }
-      $('#rsvp-send').disabled = false;
+      sending = false; $('#rsvp-send').disabled = false;
     };
 
     return {
-      // Load this browser's own replies once, when the RSVP page opens.
+      // Load this browser's own reply once, when the RSVP page opens.
       setActive(on) {
         if (on) load();
       },

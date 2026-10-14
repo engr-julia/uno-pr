@@ -11,8 +11,6 @@ const LOCAL_FILE = path.join(process.cwd(), 'rsvps.txt');
 
 const FILE = 'rsvps.txt';          // the single text file (one JSON reply per line)
 const MAX_REPLIES = 300;           // safety cap for the whole list
-const MAX_PER_BROWSER = 10;        // most replies one browser can send (e.g. a phone shared by a family)
-const MAX_GUESTS = 10;             // most people one reply can cover
 const MAX_NAME = 40;
 const MAX_MESSAGE = 300;
 
@@ -87,27 +85,25 @@ export async function POST(req) {
   const name = clean(b.name, MAX_NAME);
   if (!name) return json({ error: 'Please enter your name.' }, 400);
   const attending = b.attending;
-  const guests = attending ? Math.min(MAX_GUESTS, Math.max(1, parseInt(b.guests, 10) || 1)) : 0;
   const message = String(b.message || '').replace(/\r/g, '').trim().slice(0, MAX_MESSAGE);
 
   let ownerId = getOwner(req), headers = {};
   if (!ownerId) { ownerId = crypto.randomBytes(16).toString('hex'); headers['Set-Cookie'] = ownerCookie(ownerId); }
   const owner = sha(ownerId);
 
-  const reply = { id: crypto.randomBytes(6).toString('hex'), name, attending, guests, message, createdAt: new Date().toISOString(), owner };
+  const reply = { id: crypto.randomBytes(6).toString('hex'), name, attending, message, createdAt: new Date().toISOString(), owner };
   let out;
   try {
     out = await update(rows => {
-      // Sending again with the same name from the same browser CHANGES that reply (no duplicates).
-      const i = rows.findIndex(r => r.owner === owner && r.name.toLowerCase() === name.toLowerCase());
-      if (i >= 0) { const next = [...rows]; next[i] = { ...reply, id: rows[i].id }; return { rows: next, out: 'ok' }; }
+      // ONE reply per browser. The check runs inside the read-modify-write, so two taps at the
+      // same moment (or two tabs) can never both get saved.
+      if (rows.some(r => r.owner === owner)) return { rows, out: 'already' };
       if (rows.length >= MAX_REPLIES) return { rows, out: 'full' };
-      if (rows.filter(r => r.owner === owner).length >= MAX_PER_BROWSER) return { rows, out: 'limit' };
       return { rows: [...rows, reply], out: 'ok' };
     });
   } catch (e) { console.error('rsvp: save failed', e); return json(failBody(e, 'Sorry, your reply could not be saved right now. Please try again in a little while.'), 500); }
   if (out === 'full') return json({ error: 'We have reached the most replies this page can hold. Please message us directly. Thank you!' }, 429);
-  if (out === 'limit') return json({ error: "This browser has already sent the most replies it can. Thank you!" }, 429);
+  if (out === 'already') return json({ error: 'You have already replied. Thank you!', code: 'ALREADY' }, 409);
   const { owner: _o, ...safe } = reply;
   return json(safe, 201, headers);
 }

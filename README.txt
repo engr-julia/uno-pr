@@ -4,7 +4,7 @@ PAGES (all in public/index.html, switched with the address hash)
   #/                  Home: click the envelope
   #/details           Details: invitation, map, prayer registry link, music, RSVP link, countdown
   #/prayer-registry   Prayer Registry: guests leave notes
-  #/rsvp              RSVP: Attending / Not Attending, guest count and an optional private message (no public wall)
+  #/rsvp              RSVP: Attending / Not Attending and an optional private message, one reply per browser (no public wall)
 
 FOLDER
   public/index.html        page structure
@@ -38,7 +38,7 @@ DEPLOY ON VERCEL
   3. View/download prayers.txt and rsvps.txt: Vercel dashboard > Storage > your Blob store.
 
 RSVP EMAIL NOTIFICATIONS (Web3Forms)
-  Every RSVP is also emailed to you (engr.julia.rt@gmail.com) with the name, answer, number of guests and message.
+  Every RSVP is also emailed to you (engr.julia.rt@gmail.com) with the name, answer and message.
   1. Go to https://web3forms.com, type engr.julia.rt@gmail.com and press "Create Access Key".
      The key is emailed to you (free plan: 250 emails a month, no sign-up needed).
   2. Paste it into web3formsKey at the top of public/js/app.js (CONFIG), then redeploy.
@@ -64,14 +64,17 @@ PRAYER REGISTRY RULES
 
 RSVP RULES
   - Replies live in ONE text file (rsvps.txt), one JSON line per reply:
-      name, attending (true/false), guests, message, createdAt
-    "guests" is the number of people coming (1-10, including the person replying). Add up the
-    guests of the attending lines for your headcount. Add them up for your headcount.
+      name, attending (true/false), message, createdAt
+    (There is no guest count. Older lines from before may still show a "guests" number; ignore it.)
   - There is no public guest wall. A guest only ever sees their own reply on their own browser;
-    their message is read by you in rsvps.txt.
-  - Sending again from the same browser with the SAME name changes that reply (no duplicates).
-    A different name from the same browser adds another reply, so one phone can answer for a family.
-  - Limits (top of api/rsvp.js): 10 replies per browser, 300 in total, 10 guests per reply,
-    40 characters for the name, 300 for the message. The same hidden honeypot as the registry blocks bots.
+    their message is read by you in rsvps.txt and in the email.
+  - ONE reply per browser. Once a browser has replied, the Attending / Not Attending buttons are
+    disabled and the server refuses a second reply (even from another tab). This is tied to the
+    browser (a cookie), not to a person: someone who clears cookies, uses private mode or another
+    phone could reply again.
+  - TO TEST AGAIN after replying: open the site in a private/incognito window, or clear the site's
+    cookies, or delete that line from rsvps.txt in the Blob store (Storage > your Blob > rsvps.txt).
+  - Limits (top of api/rsvp.js): 300 replies in total, 40 characters for the name, 300 for the message.
+    The same hidden honeypot as the registry blocks bots.
   - Guests cannot delete a reply; to remove one yourself, edit rsvps.txt in the Blob store.
   - The RSVP deadline (Oct 20, 2026) is only a note on the page. Replies are not blocked after it.
