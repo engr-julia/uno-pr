@@ -54,6 +54,11 @@ IF POSTING OR RSVP SAYS "COULD NOT POST / COULD NOT SEND"
   Fix: Vercel dashboard > Storage > Create > Blob > access PRIVATE > Connect to the project > Redeploy.
   (Creating the store AFTER a deploy needs a redeploy, or the token is not seen.) /api/status also shows the exact error.
 
+  If /api/status says ok but posting still fails, the failed request's Response tab in the browser DevTools
+  (Network) shows "code" and "detail" with the real reason.
+  (Saving overwrites the whole text file. If Blob rejects the "has anyone else changed it?" check, the code retries and
+  then saves without it, so a reply is not lost.)
+
 PRAYER REGISTRY RULES
   - All prayers live in ONE text file (prayers.txt), one note per line.
   - Each browser gets a random cookie; only that browser sees the trash icon on its own notes

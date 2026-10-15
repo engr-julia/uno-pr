@@ -30,6 +30,8 @@ const needBlob = () => { if (!USE_BLOB && ON_VERCEL) throw Object.assign(new Err
 const failBody = (e, msg) => ({ error: msg, code: e && e.code === 'NO_STORAGE' ? 'NO_STORAGE' : 'SAVE_FAILED', detail: String((e && e.message) || e).slice(0, 240) });
 
 // ---- the text file ----
+let skipEtag = false;   // set once the ETag safety check proves unreliable (stays for the life of this server instance)
+const isClash = e => /precondition|etag mismatch/i.test(String((e && ((e.name || '') + ' ' + (e.message || ''))) || ''));
 async function read() {
   needBlob();
   if (!USE_BLOB) return { notes: fs.existsSync(LOCAL_FILE) ? parse(fs.readFileSync(LOCAL_FILE, 'utf8')) : [], etag: null };
@@ -48,17 +50,23 @@ async function update(change) {
     if (next !== notes) fs.writeFileSync(LOCAL_FILE, serialize(next));
     return out;
   }
-  const { put, BlobPreconditionFailedError } = await import('@vercel/blob');
-  for (let i = 0; i < 5; i++) {
+  const { put } = await import('@vercel/blob');
+  for (let i = 0; i < 3; i++) {
     const { notes, etag } = await read();
     const { notes: next, out } = change(notes);
     if (next === notes) return out; // nothing to save
     const body = serialize(next);
+    // Normally the write only succeeds if nobody changed the file since we read it (ETag check), and a
+    // clash just retries. Blob has been seen rejecting that ETag even with no other writer, so after two
+    // clashes (or once the check has proved unreliable) the last attempt saves WITHOUT it. The reply is
+    // never lost; the only cost is a tiny chance of two people saving in the same instant.
+    const guard = etag && i < 2 && !skipEtag;
     try {
-      await put(FILE, body, { access: 'private', allowOverwrite: true, addRandomSuffix: false, contentType: 'text/plain', ...(etag ? { ifMatch: etag } : {}) });
+      await put(FILE, body, { access: 'private', allowOverwrite: true, addRandomSuffix: false, contentType: 'text/plain', ...(guard ? { ifMatch: etag } : {}) });
       return out;
     } catch (e) {
-      if (!(e instanceof BlobPreconditionFailedError) || i === 4) throw e;
+      if (!isClash(e) || i === 2) throw e;
+      if (i === 1) skipEtag = true;
     }
   }
 }
